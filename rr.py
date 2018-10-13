@@ -5,6 +5,26 @@ import urllib.request
 from flask import Flask
 from bs4 import BeautifulSoup
 
+def parse(link, date, concerts):
+    event = str(link).replace("<a>", '').replace("</a>", "")\
+                     .replace("</span>", '').replace("<span>", "")\
+                     .replace(", More Info, Buy Tickets", "")\
+                     .replace("[", '').replace("]", '')
+
+    stripped = str(event).split(' - ', 1)
+    show = str(stripped[0])
+    time = str(stripped[1])
+
+    print(stripped)
+
+    date = str(date).replace("</span>", '').replace("<span>", '')\
+                    .replace(" -", '')
+
+    concert = "<tr> <td style='width:120'>" + date + "</td><td style='width:80'>" \
+               + time + "</td><td style='width:220'>" + show + "</td></tr>"
+    concerts = concerts + concert
+    return concerts
+
 def scrape_rr():
     year = "2019"
     base_url = "https://www.redrocksonline.com//events/calendar/%s/" % year
@@ -44,30 +64,24 @@ def scrape_rr():
 
             try:
 
-                event = str(link).replace("<a>", '').replace("</a>", '')\
-                                 .replace("</span>", '').replace("<span>", '')\
-                                 .replace(", More Info, Buy Tickets", '').replace("[", '')\
-                                 .replace("]", '')
+            	concerts = parse(link, date, concerts)
 
-                date = str(date).replace("</span>", '').replace("<span>", '')\
-                                .replace(" -", '')
-
-                concert = date + ' : ' + event
-                concerts = concerts + "<br>" + concert
             except:
                 pass
-    return concerts
+
+    return "<body style='background-color:#F7F1E6'><center><h2>Calendar " + year + "</h2><table>" + concerts \
+            + "</table></center></body>"
 
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Scrapping redrocksonline.com ...<meta http-equiv='refresh' content='0; url=/rr' />", 200
+    return "Scraping redrocksonline.com ...<meta http-equiv='refresh' content='0; url=/rr' />", 200
 
 @app.route("/rr")
 def index():
-    return scrape_rr(), 200 
- 
+    return scrape_rr(), 200
+
 if __name__ == "__main__":
-    app.run("0.0.0.0",5000)
+    app.run("0.0.0.0", 5000)
