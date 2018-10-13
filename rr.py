@@ -5,6 +5,7 @@ import urllib.request
 from flask import Flask
 from bs4 import BeautifulSoup
 
+
 def parse(link, date, concerts):
     event = str(link).replace("<a>", '').replace("</a>", "")\
                      .replace("</span>", '').replace("<span>", "")\
